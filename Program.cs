@@ -1,11 +1,12 @@
+using FarcanaWriterAPI.Services.WebSocketProcess;
+
 namespace FarcanaWriterAPI
 {
     public class Program
     {
-        readonly static string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.

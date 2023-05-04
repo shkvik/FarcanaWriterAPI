@@ -25,7 +25,7 @@ class ArticalParser
         ConsoleFormat.Info($"start fill articals model");
 
         //foreach (var (url, index) in urls.Select((value, i) => (value, i)))
-        for (int index = 0; index < 5; index++)
+        for (int index = 0; index < 10; index++)
         {
 
             try
@@ -61,7 +61,7 @@ class ArticalParser
         ConsoleFormat.Info($"start fill articals model");
 
         //foreach (var (url, index) in urls.Select((value, i) => (value, i)))
-        for (int index = 0; index < 5; index++)
+        for (int index = 0; index < 10; index++)
         {
 
             try

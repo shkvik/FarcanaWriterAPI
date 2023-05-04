@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Html.Dom;
 using Colorify;
+using FarcanaWriterAPI.Services.WebSocketProcess;
 using Microsoft.Extensions.Configuration;
 using IConfiguration = AngleSharp.IConfiguration;
 
@@ -50,18 +51,29 @@ namespace FarcanaMarketUtility.Polygon
 
         public async Task<IEnumerable<string>?> GetLinksFromArchivePages()
         {
+            var countDebug = 16;
+
             var archives = new List<string>();
+            //var wsProcess = new WebSocketProcess();
+
+
+
             using (var progress = new ProgressBar())
             {
-                for (int i = 1; i < 16; i++)
+                for (int i = 1; i < countDebug; i++)
                 {
                     try
                     {
-                        progress.Report((double)i / 16);
+                        var progressCount = (double)i / countDebug;
+
+                        progress.Report(progressCount);
                         var document = await _BrowsingContext.OpenAsync(String.Format(PolygonArchiveURL + $"{i}"));
                         var cellSelector = "a.c-entry-box--compact__image-wrapper";
                         var cells = document.QuerySelectorAll(cellSelector);
                         archives.AddRange(cells.Select(m => ((IHtmlAnchorElement)m).Href));
+
+                        //wsProcess.SendMessage(Convert.ToString(progressCount));
+                        
                     }
                     catch (Exception ex)
                     {
@@ -70,6 +82,7 @@ namespace FarcanaMarketUtility.Polygon
                     }
                 }
             }
+            //wsProcess.CloseConnection();
             return archives;
         }
     }

@@ -16,18 +16,36 @@ namespace FarcanaWriterAPI.Controllers
             return await new PolygonWrapper().GetPolygonListURLs();
         }
 
-        [HttpGet("GetArricalsTableData")]
-        public async Task<IEnumerable<ArticalModel>> GetArricalsTableData()
+        [HttpGet("UpdateArticalsData")]
+        public async Task<bool> UpdateArticalsData()
+        {
+            try
+            {
+                var urls = await new PolygonWrapper().GetPolygonListURLs();
+                var articals = await new ArticalParser().GetArticalList(urls);
+
+                Storage.Update(articals);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ConsoleFormat.Fail(ex.Message);
+                return false;
+            }
+        }
+
+
+        [HttpGet("GetArticalsTableData")]
+        public async Task<IEnumerable<ArticalModel>> GetArticalsTableData()
         {
             var urls = await new PolygonWrapper().GetPolygonListURLs();
             return await new ArticalParser().GetArticalTableList(urls);
         }
 
         [HttpGet("GetArricals")]
-        public async Task<IEnumerable<ArticalModel>> GetArricals()
+        public IEnumerable<ArticalModel> GetArricals()
         {
-            var urls = await new PolygonWrapper().GetPolygonListURLs();
-            return await new ArticalParser().GetArticalList(urls);
+            return Storage.Get();
         }
 
         // GET api/<PolygonController>/5
