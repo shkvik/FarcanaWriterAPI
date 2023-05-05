@@ -20,11 +20,19 @@ namespace FarcanaWriterAPI.Services.WebSocketProcess
 
             Server.Start();
 
+            SocketThread = new Thread(new ParameterizedThreadStart(SocketThreadMain));
+            SocketThread.Start();
         }
 
         private void SocketThreadMain(object? o)
         {
-            
+            var server = new WebSocketServer();
+            server.Setup(8090);
+
+            server.NewSessionConnected += OnNewSessionConnected;
+            server.NewMessageReceived += OnNewMessageReceived;
+            server.SessionClosed += OnSessionClosed;
+
         }
 
         public async Task<bool> IsReady()

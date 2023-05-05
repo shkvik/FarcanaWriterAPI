@@ -1,3 +1,4 @@
+using FarcanaWriterAPI.Services.OpenAI;
 using FarcanaWriterAPI.Services.WebSocketProcess;
 
 namespace FarcanaWriterAPI
@@ -6,6 +7,8 @@ namespace FarcanaWriterAPI
     {
         public static void Main(string[] args)
         {
+
+            var webSocket = new WebSocketProcess();
 
             var builder = WebApplication.CreateBuilder(args);
 

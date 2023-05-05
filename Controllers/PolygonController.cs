@@ -1,4 +1,5 @@
 ﻿using FarcanaMarketUtility.Polygon;
+using FarcanaWriterAPI.Services.OpenAI;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,7 +10,7 @@ namespace FarcanaWriterAPI.Controllers
     [ApiController]
     public class PolygonController : ControllerBase
     {
-        // GET: api/<PolygonController>
+
         [HttpGet("GetPolygonUrls")]
         public async Task<IEnumerable<string>> GetPolygonUrls()
         {
@@ -36,28 +37,29 @@ namespace FarcanaWriterAPI.Controllers
 
 
         [HttpGet("GetArticalsTableData")]
-        public async Task<IEnumerable<ArticalModel>> GetArticalsTableData()
+        public IEnumerable<ArticalModel> GetArticalsTableData()
         {
-            var urls = await new PolygonWrapper().GetPolygonListURLs();
-            return await new ArticalParser().GetArticalTableList(urls);
+            return Storage.GetAll();
         }
 
-        [HttpGet("GetArricals")]
+        [HttpGet("GetArticals")]
         public IEnumerable<ArticalModel> GetArricals()
         {
-            return Storage.Get();
+            return Storage.GetAll();
         }
 
-        // GET api/<PolygonController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("GetArtical/{id}")]
+        public ArticalModel? GetArtical(int id)
         {
-            return "value";
+            return Storage.GetItemById(id);
         }
 
         [HttpGet("testing")]
-        public string Testing()
+        public async Task<string> Testing()
         {
+            var test = new RewriterAdapter();
+            await test.Test();
+
             return "value";
         }
     }
