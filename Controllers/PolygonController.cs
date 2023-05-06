@@ -1,5 +1,6 @@
 ﻿using FarcanaMarketUtility.Polygon;
 using FarcanaWriterAPI.Services.OpenAI;
+using FarcanaWriterAPI.Services.WebSocketProcess;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -14,7 +15,8 @@ namespace FarcanaWriterAPI.Controllers
         [HttpGet("GetPolygonUrls")]
         public async Task<IEnumerable<string>> GetPolygonUrls()
         {
-            return await new PolygonWrapper().GetPolygonListURLs();
+            var webSocket = new WebSocketDecorator<WebSocketProcess>();
+            return await new PolygonWrapper().GetPolygonListURLs(webSocket.Send);
         }
 
         [HttpGet("UpdateArticalsData")]
@@ -22,10 +24,14 @@ namespace FarcanaWriterAPI.Controllers
         {
             try
             {
-                var urls = await new PolygonWrapper().GetPolygonListURLs();
-                var articals = await new ArticalParser().GetArticalList(urls);
+                var webSocket = new WebSocketDecorator<WebSocketProcess>();
+                webSocket.Start();
+                var urls = await new PolygonWrapper().GetPolygonListURLs(webSocket.Send);
+                var articals = await new ArticalParser().GetArticalList(urls, webSocket.Send);
 
                 Storage.Update(articals);
+                await webSocket.Stop();
+
                 return true;
             }
             catch (Exception ex)
@@ -57,9 +63,17 @@ namespace FarcanaWriterAPI.Controllers
         [HttpGet("testing")]
         public async Task<string> Testing()
         {
-            var test = new RewriterAdapter();
-            await test.Test();
-
+            //var test = new RewriterAdapter();
+            //await test.Test();
+            var test = new WebSocketDecorator<WebSocketProcess>();
+            test.Start();
+            for(int i = 0;i< 5; i++)
+            {
+                await Task.Delay(1000);
+                test.Send("message");
+            }
+           
+            await test.Stop();
             return "value";
         }
     }

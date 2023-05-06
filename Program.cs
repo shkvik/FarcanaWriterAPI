@@ -1,29 +1,30 @@
 using FarcanaWriterAPI.Services.OpenAI;
 using FarcanaWriterAPI.Services.WebSocketProcess;
+using System.Net.WebSockets;
+using System.Text;
+using WebSocketSharp;
+using WebSocketSharp.Server;
+
+
 
 namespace FarcanaWriterAPI
 {
+
     public class Program
     {
+
+
         public static void Main(string[] args)
         {
-
-            var webSocket = new WebSocketProcess();
-
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors();
-                
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -35,7 +36,6 @@ namespace FarcanaWriterAPI
             app.UseCors(builder => builder.AllowAnyOrigin());
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

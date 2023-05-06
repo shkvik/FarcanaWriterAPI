@@ -2,14 +2,26 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Colorify;
+using FarcanaWriterAPI.Services.WebSocketProcess;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using IConfiguration = AngleSharp.IConfiguration;
 
+
+class Info
+{
+    [JsonProperty("current")]
+    public int Current { get; set; }
+
+    [JsonProperty("total")]
+    public int Total { get; set; }
+}
 
 class ArticalParser
 {
@@ -17,7 +29,7 @@ class ArticalParser
     private IConfiguration _Configuration => Configuration.Default.WithDefaultLoader();
     private IBrowsingContext _BrowsingContext => BrowsingContext.New(_Configuration);
 
-    public async Task<List<ArticalModel>> GetArticalList(List<string> urls)
+    public async Task<List<ArticalModel>> GetArticalList(List<string> urls, Action<string> webSocketSend)
     {
         var articalList = new List<ArticalModel>();
 
@@ -25,12 +37,15 @@ class ArticalParser
         ConsoleFormat.Info($"start fill articals model");
 
         //foreach (var (url, index) in urls.Select((value, i) => (value, i)))
-        for (int index = 0; index < 10; index++)
+        var dbgCount = 10;
+
+        for (int index = 0; index < dbgCount; index++)
         {
 
             try
             {
                 var document = await _BrowsingContext.OpenAsync(urls[index]);
+
                 var articalModel = new ArticalModel
                 {
                     Id          = index,
@@ -40,8 +55,19 @@ class ArticalParser
                     Date        = document.QuerySelector("time.c-byline__item").GetAttribute("datetime"),
                     Article     = document.QuerySelector("div.c-entry-content ").Text()
                 };
+
                 articalList.Add(articalModel);
+
                 ConsoleFormat.Info($"[{index}] success loaded [{articalModel.Title} | {articalModel.Date}]");
+
+                var processMsg = new ProcessMessage()
+                {
+                    Step = Step.ContentParsing,
+                    Count = (float)index / dbgCount
+                };
+
+                webSocketSend(JsonConvert.SerializeObject(processMsg));
+
             }
             catch (Exception ex)
             {
